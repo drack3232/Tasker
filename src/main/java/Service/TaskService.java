@@ -74,7 +74,7 @@ public class TaskService {
     }
 
     @Transactional
-    public void deleteTask(Long taskId, Long userId) {
+    public void deleteTask(Long taskId) {
         taskRepository.deleteById(taskId);
     }
 
