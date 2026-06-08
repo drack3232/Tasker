@@ -27,7 +27,7 @@ public class Task {
     private String description;
 
     @Column(nullable = false)
-    private LocalDateTime dedline;
+    private LocalDateTime deadline;
 
 @Column(name = "user_id", nullable = false)
     private Long userId;
