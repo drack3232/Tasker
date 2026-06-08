@@ -1,4 +1,4 @@
-package DTO;
+package com.trasker.Tasker.DTO;
 
 import jakarta.validation.constraints.*;
 

@@ -1,4 +1,4 @@
-package Entity;
+package com.trasker.Tasker.Entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

@@ -1,14 +1,12 @@
-package Service;
+package com.trasker.Tasker.Service;
 
-import DTO.TaskCreateDTO;
-import DTO.TaskResponseDTO;
-import Entity.Task;
-import Reposetorys.TaskRepository;
-import lombok.RequiredArgsConstructor;
+import com.trasker.Tasker.DTO.TaskCreateDTO;
+import com.trasker.Tasker.DTO.TaskResponseDTO;
+import com.trasker.Tasker.Entity.Task;
+import com.trasker.Tasker.Reposetorys.TaskRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
