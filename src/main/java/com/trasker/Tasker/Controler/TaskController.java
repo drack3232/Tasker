@@ -4,6 +4,7 @@ import com.trasker.Tasker.DTO.TaskCreateDTO;
 import com.trasker.Tasker.DTO.TaskResponseDTO;
 import com.trasker.Tasker.Service.TaskService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -41,15 +42,27 @@ public class TaskController {
 @PutMapping("/{id}")
     public ResponseEntity<TaskResponseDTO> updateTask(
             @PathVariable Long id,
-            @Valid @RequestBody TaskCreateDTO taskCreateDTO, Long taskId, Long userId) {
+            @Valid @RequestBody TaskCreateDTO taskCreateDTO) {
+    Long userId = 1L;
 
-        TaskResponseDTO updateTask = taskService.updateTask(taskId, userId, taskCreateDTO);
+        TaskResponseDTO updateTask = taskService.updateTask( id,userId, taskCreateDTO);
         return ResponseEntity.ok(updateTask);
 }
 
 @DeleteMapping("/{id}")
-    public ResponseEntity<TaskResponseDTO> deleteTask(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
         return  ResponseEntity.noContent().build();
 }
+
+@GetMapping("/{id}/export")
+    public ResponseEntity<String> exportTask(@PathVariable Long id) {
+        Long userId = 1L;
+        String icsContent = taskService.generateIcs(id,userId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "text/calendar; charset=utf-8")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Task-" + id + ".ics\"")
+                .body(icsContent);
+}
+
 }
