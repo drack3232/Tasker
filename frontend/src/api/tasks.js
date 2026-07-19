@@ -1,32 +1,39 @@
-const BASE_URL = 'http://localhost:8080/api/task';
+import { API_BASE_URL } from '../config';
 
-export const getTasks = async (userId) => {
-    const res = await fetch(`${BASE_URL}?userId=${userId}`);
-    if (!res.ok) throw new Error('Failed to fetch tasks');
-    return res.json();
-};
+// Every function here maps 1:1 to a backend endpoint.
+// Add new task-related requests here, not inside components.
 
-export const createTask = async (task) => {
-    const res = await fetch(BASE_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(task),
-    });
-    if (!res.ok) throw new Error('Failed to create task');
-    return res.json();
-};
+async function handleResponse(response, errorMessage) {
+  if (!response.ok) {
+    throw new Error(errorMessage);
+  }
+  // DELETE returns 204 No Content — nothing to parse.
+  if (response.status === 204) return null;
+  return response.json();
+}
 
-export const updateTask = async (id, task) => {
-    const res = await fetch(`${BASE_URL}/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(task),
-    });
-    if (!res.ok) throw new Error('Failed to update task');
-    return res.json();
-};
+export function fetchTasks(userId) {
+  return fetch(`${API_BASE_URL}?userId=${userId}`)
+    .then((res) => handleResponse(res, 'Could not load tasks'));
+}
 
-export const deleteTask = async (id) => {
-    const res = await fetch(`${BASE_URL}/${id}`, { method: 'DELETE' });
-    if (!res.ok) throw new Error('Failed to delete task');
-};
+export function createTask(task) {
+  return fetch(API_BASE_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(task),
+  }).then((res) => handleResponse(res, 'Could not create task'));
+}
+
+export function updateTask(id, task) {
+  return fetch(`${API_BASE_URL}/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(task),
+  }).then((res) => handleResponse(res, 'Could not update task'));
+}
+
+export function deleteTask(id) {
+  return fetch(`${API_BASE_URL}/${id}`, { method: 'DELETE' })
+    .then((res) => handleResponse(res, 'Could not delete task'));
+}

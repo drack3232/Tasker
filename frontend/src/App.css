@@ -1,184 +1,756 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Source+Sans+3:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
+/* ==========================================================================
+   TOKENS — colors, fonts, radii. Change the theme by editing this section.
+   ========================================================================== */
+
+:root {
+  /* Paper & ink palette: warm off-white page, deep navy ink accent,
+     a stamped-red for urgency (like a due-date rubber stamp). */
+  --paper: #f6f1e7;
+  --paper-raised: #fffdf8;
+  --rule: #ddd3bf;
+  --rule-strong: #c9bc9e;
+
+  --ink: #1c2333;
+  --ink-soft: #5b6272;
+  --ink-faint: #9a9587;
+
+  --navy: #1f3a5f;
+  --navy-deep: #16293f;
+
+  --stamp-red: #a13d34;
+  --stamp-red-soft: #f1e0dc;
+  --amber: #b8842c;
+  --amber-soft: #f4e8d2;
+  --moss: #4b6b4f;
+  --moss-soft: #e2eadf;
+
+  --radius-lg: 4px;
+  --radius-md: 3px;
+  --radius-sm: 2px;
+
+  --shadow-card: 0 1px 2px rgba(28, 35, 51, 0.06), 0 1px 1px rgba(28, 35, 51, 0.08);
+  --shadow-modal: 0 20px 50px rgba(22, 41, 63, 0.25);
+
+  --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
+  --font-body: 'Source Sans 3', -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
 }
 
-.hero {
+/* Dark theme: same notebook character, read by lamplight —
+   warm charcoal instead of pure black, accents brightened to stay legible. */
+[data-theme='dark'] {
+  --paper: #1b1a17;
+  --paper-raised: #24221e;
+  --rule: #3a372f;
+  --rule-strong: #4b473c;
+
+  --ink: #ece7db;
+  --ink-soft: #b7b0a0;
+  --ink-faint: #7d7767;
+
+  --navy: #7ea3d1;
+  --navy-deep: #a8c4e6;
+
+  --stamp-red: #e2867b;
+  --stamp-red-soft: #3d2620;
+  --amber: #dcb15c;
+  --amber-soft: #3a2f1a;
+  --moss: #8fbf94;
+  --moss-soft: #223225;
+
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 1px rgba(0, 0, 0, 0.2);
+  --shadow-modal: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* In dark mode the primary button and toggle need dark text on a light accent,
+   not light text on navy, or contrast inverts oddly. */
+[data-theme='dark'] .btn--primary {
+  color: #1b1a17;
+}
+
+[data-theme='dark'] .tabs__item--active {
+  color: #1b1a17;
+}
+
+/* ==========================================================================
+   BASE — reset and global element styles
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
   position: relative;
+  margin: 0;
+  min-height: 100vh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
 
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
+/* A faint paper grain, purely decorative, sits behind everything.
+   Absolutely positioned against body (not fixed against the viewport),
+   so it covers the whole scrollable document, not just the first screen. */
+body::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(var(--rule) 0.5px, transparent 0.5px);
+  background-size: 22px 22px;
+  opacity: 0.35;
+  z-index: 0;
+}
 
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
+  color: var(--ink);
+  margin: 0;
+}
 
-  .framework,
-  .vite {
-    position: absolute;
-  }
+p {
+  margin: 0;
+}
 
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
+button {
+  font-family: inherit;
+}
 
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
+input,
+textarea {
+  font-family: var(--font-body);
+}
+
+:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
-#center {
+/* ==========================================================================
+   LAYOUT — page shell, header, footer
+   ========================================================================== */
+
+/*
+  .page is a plain block with no height constraint of its own —
+  it's exactly as tall as its content (header + tasks + footer) and
+  nothing more. body's background already covers the full document,
+  so there's never a gap of "leftover" background below the footer.
+*/
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.page__content {
+  padding-top: 8px;
+  padding-bottom: 40px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding: 48px 0 28px;
+  border-bottom: 2px solid var(--ink);
+  margin-bottom: 36px;
+}
+
+.header__identity {
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
+  gap: 6px;
 }
 
-#next-steps {
+.header__logo {
   display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
-
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+  align-items: center;
+  gap: 12px;
 }
 
-#docs {
-  border-right: 1px solid var(--border);
-
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
+.header__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--navy);
+  color: var(--paper-raised);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
 }
 
-#next-steps ul {
-  list-style: none;
-  padding: 0;
+.header__title {
+  font-size: 34px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.header__tagline {
+  font-size: 13px;
+  color: var(--ink-faint);
+  padding-left: 52px;
+  font-style: italic;
+}
+
+.header__actions {
   display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.icon-btn--toggle {
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--rule-strong);
+}
+
+@media (max-width: 560px) {
+  .header {
+    padding-top: 32px;
+  }
+
+  .header__tagline {
+    padding-left: 0;
+  }
+}
+
+/* ==========================================================================
+   BUTTONS — shared button and icon-button styles
+   ========================================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
   gap: 8px;
-  margin: 32px 0 0;
-
-  .logo {
-    height: 18px;
-  }
-
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
-
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
-  }
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 10px 18px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+.btn:active {
+  transform: scale(0.98);
 }
 
-.ticks {
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn--primary {
+  background: var(--navy);
+  color: var(--paper-raised);
+}
+
+.btn--primary:hover:not(:disabled) {
+  background: var(--navy-deep);
+}
+
+.btn--ghost {
+  background: transparent;
+  border-color: var(--rule-strong);
+  color: var(--ink-soft);
+}
+
+.btn--ghost:hover {
+  border-color: var(--ink-soft);
+  color: var(--ink);
+}
+
+.btn--danger {
+  background: var(--stamp-red);
+  color: var(--paper-raised);
+}
+
+.btn--danger:hover {
+  background: #8a332b;
+}
+
+/* Small icon-only buttons used inside cards and modals */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.icon-btn:hover {
+  background: var(--rule);
+  color: var(--ink);
+}
+
+.icon-btn--danger:hover {
+  background: var(--stamp-red-soft);
+  color: var(--stamp-red);
+}
+
+/* ==========================================================================
+   TOOLBAR — search field and filter tabs
+   ========================================================================== */
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.search {
   position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 220px;
+  max-width: 360px;
+}
+
+.search__icon {
+  position: absolute;
+  left: 14px;
+  color: var(--ink-faint);
+  pointer-events: none;
+}
+
+.search__input {
   width: 100%;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 11px 36px 11px 40px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
+.search__input::placeholder {
+  color: var(--ink-faint);
+}
+
+.search__input:focus {
+  border-color: var(--navy);
+}
+
+.search__clear {
+  position: absolute;
+  right: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none;
+  background: var(--rule);
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  padding: 4px;
+}
+
+.tabs__item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--ink-soft);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.tabs__item:hover {
+  color: var(--ink);
+}
+
+.tabs__item--active {
+  background: var(--navy);
+  color: var(--paper-raised);
+}
+
+.tabs__count {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: rgba(0, 0, 0, 0.12);
+  border-radius: 999px;
+  padding: 1px 6px;
+}
+
+.tabs__item--active .tabs__count {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 560px) {
+  .search {
+    max-width: none;
+    width: 100%;
   }
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
+  .tabs {
+    width: 100%;
+    justify-content: space-between;
   }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
+
+  .tabs__item {
+    flex: 1;
+    justify-content: center;
   }
+}
+
+/* ==========================================================================
+   TASK CARD — the visual signature of the app (ruled notebook margin)
+   ========================================================================== */
+
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+/*
+  Signature detail: every card reads like a torn notebook page —
+  a solid ink-colored margin rule on the left, colored by urgency,
+  echoing a hand-drawn red margin line on ruled paper.
+*/
+.task-card {
+  position: relative;
+  background: var(--paper-raised);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--rule-strong);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-card);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.task-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(28, 35, 51, 0.1);
+}
+
+.task-card--overdue {
+  border-left-color: var(--stamp-red);
+}
+
+.task-card--urgent {
+  border-left-color: var(--amber);
+}
+
+.task-card--soon {
+  border-left-color: var(--navy);
+}
+
+.task-card--ok {
+  border-left-color: var(--moss);
+}
+
+.task-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.task-card__actions {
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.task-card:hover .task-card__actions,
+.task-card:focus-within .task-card__actions {
+  opacity: 1;
+}
+
+.task-card__title {
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.task-card__description {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.task-card__deadline {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  color: var(--ink-faint);
+  margin-top: 2px;
+}
+
+/* Status pill, stamped-label styling */
+.pill {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.pill--overdue {
+  background: var(--stamp-red-soft);
+  color: var(--stamp-red);
+}
+
+.pill--urgent {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.pill--soon {
+  background: #e4ecf5;
+  color: var(--navy);
+}
+
+.pill--ok {
+  background: var(--moss-soft);
+  color: var(--moss);
+}
+
+.pill--none {
+  background: var(--rule);
+  color: var(--ink-faint);
+}
+
+/* ==========================================================================
+   STATES — loading, error, and empty state panels
+   ========================================================================== */
+
+.state-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 90px 20px;
+  border: 1px dashed var(--rule-strong);
+  border-radius: var(--radius-lg);
+  background: var(--paper-raised);
+}
+
+.state-panel p {
+  font-size: 13.5px;
+  color: var(--ink-soft);
+  max-width: 320px;
+}
+
+.state-panel__heading {
+  font-family: var(--font-display);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.state-panel--error {
+  border-color: var(--stamp-red-soft);
+  border-style: solid;
+}
+
+.state-panel--error p:first-of-type {
+  color: var(--stamp-red);
+}
+
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 3px solid var(--rule);
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   MODAL — overlay, form fields, confirm dialog
+   ========================================================================== */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 24, 30, 0.55);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  animation: fade-in 0.15s ease;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.modal {
+  width: 100%;
+  max-width: 440px;
+  background: var(--paper-raised);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-modal);
+  animation: rise-in 0.18s ease;
+}
+
+.modal--small {
+  max-width: 380px;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+}
+
+.modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 24px 0;
+}
+
+.modal__header h2 {
+  font-size: 19px;
+  font-weight: 600;
+}
+
+.modal__form {
+  padding: 18px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+}
+
+.field input,
+.field textarea {
+  background: var(--paper);
+  border: 1px solid var(--rule-strong);
+  border-radius: var(--radius-md);
+  color: var(--ink);
+  font-size: 14px;
+  padding: 10px 12px;
+  outline: none;
+  resize: vertical;
+  transition: border-color 0.15s ease;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--navy);
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  color: var(--ink-faint);
+}
+
+.modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding-top: 4px;
+}
+
+.confirm-message {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+/* ==========================================================================
+   FOOTER
+   ========================================================================== */
+
+.footer {
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+  text-align: center;
+}
+
+.footer__text {
+  font-size: 12px;
+  color: var(--ink-faint);
 }
