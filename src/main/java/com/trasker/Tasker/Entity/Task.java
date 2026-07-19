@@ -34,6 +34,9 @@ public class Task {
 
 @Column(name = "create_at", nullable = false,unique = false)
     private LocalDateTime createAt;
+@Enumerated(EnumType.STRING)
+@Column(name = "status")
+private Status status;
 
 @PrePersist
     protected void setTimeBeforeSave(){

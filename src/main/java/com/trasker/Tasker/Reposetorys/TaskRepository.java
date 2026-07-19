@@ -1,5 +1,6 @@
 package com.trasker.Tasker.Reposetorys;
 
+import com.trasker.Tasker.Entity.Status;
 import com.trasker.Tasker.Entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,4 +14,6 @@ List<Task> findByUserIdAndDeadlineAfter(Long userId, LocalDateTime dedlineAfter)
 List<Task> findAllByUserId(Long userId);
 boolean existsByUserIdAndTitle(Long userId, String title);
 Optional<Task> findByIdAndUserId(Long id, Long userId);
+List<Task> findAllByStatusAndUserId(Status status, Long userId);
+List<Task> findAllByStatusNotAndUserId(Status status, Long userId);
 }

@@ -2,6 +2,7 @@ package com.trasker.Tasker.Service;
 
 import com.trasker.Tasker.DTO.TaskCreateDTO;
 import com.trasker.Tasker.DTO.TaskResponseDTO;
+import com.trasker.Tasker.Entity.Status;
 import com.trasker.Tasker.Entity.Task;
 import com.trasker.Tasker.Reposetorys.TaskRepository;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,16 @@ public class TaskService {
         this.taskRepository = taskRepository;
     }
 
+    private TaskResponseDTO convertTask(Task task){
+        return new TaskResponseDTO(
+                task.getId(),
+                task.getStatus(),
+                task.getTitle(),
+                task.getDescription(),
+                task.getDeadline()
+        );
+    }
+
     @Transactional
     public TaskResponseDTO createTask(long userId, TaskCreateDTO taskCreateDTO) {
         if(taskRepository.existsByUserIdAndTitle(userId, taskCreateDTO.title())){
@@ -27,18 +38,14 @@ public class TaskService {
         }
         Task task = new Task();
         task.setTitle(taskCreateDTO.title());
+        task.setStatus(taskCreateDTO.status());
         task.setDescription(taskCreateDTO.description());
         task.setDeadline(taskCreateDTO.deadline());
         task.setUserId(userId);
 
         Task savedTask = taskRepository.save(task);
 
-        return new TaskResponseDTO(
-                savedTask.getId(),
-                savedTask.getTitle(),
-                savedTask.getDescription(),
-                savedTask.getDeadline()
-        );
+        return convertTask(savedTask);
 
     }
 
@@ -47,12 +54,8 @@ public class TaskService {
         List<Task> userTasks = taskRepository.findAllByUserId(userId);
 
         return userTasks.stream()
-                .map(task -> new TaskResponseDTO(
-                   task.getId(),
-                        task.getTitle(),
-                        task.getDescription(),
-                        task.getDeadline()
-                ))
+                .map(this::convertTask
+                )
                 .toList();
     }
 
@@ -66,16 +69,20 @@ public class TaskService {
         existingTask.setDeadline(taskCreateDTO.deadline());
 
         Task savedTask = taskRepository.save(existingTask);
-        return new TaskResponseDTO(savedTask.getId(),
-                savedTask.getTitle(),
-                savedTask.getDescription(),
-                savedTask.getDeadline());
+        return convertTask(existingTask);
 
     }
 
     @Transactional
     public void deleteTask(Long taskId) {
         taskRepository.deleteById(taskId);
+    }
+
+    public List<TaskResponseDTO> getTasksByStatus(Status status, Long userId) {
+        List<Task> userTasks = taskRepository.findAllByStatusAndUserId(status,userId);
+        return userTasks.stream()
+                .map(this::convertTask)
+                .toList();
     }
 
     @Transactional(readOnly = true)

@@ -2,6 +2,7 @@ package com.trasker.Tasker.Controler;
 
 import com.trasker.Tasker.DTO.TaskCreateDTO;
 import com.trasker.Tasker.DTO.TaskResponseDTO;
+import com.trasker.Tasker.Entity.Status;
 import com.trasker.Tasker.Service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
@@ -24,45 +25,55 @@ public class TaskController {
 
     }
 
-  @GetMapping
+    @GetMapping
     public ResponseEntity<List<TaskResponseDTO>> findAll() {
-      long userId = 1L;
-      List<TaskResponseDTO> tasks = taskService.findAllTasks(userId);
-        return ResponseEntity.ok(tasks);
-  }
-
-  @PostMapping
-    public ResponseEntity<TaskResponseDTO> createTask(  @Valid @RequestBody TaskCreateDTO taskCreateDTO  ){
         long userId = 1L;
-   TaskResponseDTO savedTask = taskService.createTask(userId, taskCreateDTO);
+        List<TaskResponseDTO> tasks = taskService.findAllTasks(userId);
+        return ResponseEntity.ok(tasks);
+    }
 
-   return ResponseEntity.status(HttpStatus.CREATED).body((savedTask));
-  }
+    @PostMapping
+    public ResponseEntity<TaskResponseDTO> createTask(@Valid @RequestBody TaskCreateDTO taskCreateDTO) {
+        long userId = 1L;
+        TaskResponseDTO savedTask = taskService.createTask(userId, taskCreateDTO);
 
-@PutMapping("/{id}")
+        return ResponseEntity.status(HttpStatus.CREATED).body((savedTask));
+    }
+
+    @PutMapping("/{id}")
     public ResponseEntity<TaskResponseDTO> updateTask(
             @PathVariable Long id,
             @Valid @RequestBody TaskCreateDTO taskCreateDTO) {
-    Long userId = 1L;
+        Long userId = 1L;
 
-        TaskResponseDTO updateTask = taskService.updateTask( id,userId, taskCreateDTO);
+        TaskResponseDTO updateTask = taskService.updateTask(id, userId, taskCreateDTO);
         return ResponseEntity.ok(updateTask);
-}
+    }
 
-@DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTask(@PathVariable Long id) {
         taskService.deleteTask(id);
-        return  ResponseEntity.noContent().build();
-}
+        return ResponseEntity.noContent().build();
+    }
 
-@GetMapping("/{id}/export")
+    @GetMapping("/{id}/export")
     public ResponseEntity<String> exportTask(@PathVariable Long id) {
         Long userId = 1L;
-        String icsContent = taskService.generateIcs(id,userId);
+        String icsContent = taskService.generateIcs(id, userId);
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, "text/calendar; charset=utf-8")
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"Task-" + id + ".ics\"")
                 .body(icsContent);
-}
+    }
 
+    @GetMapping("/filter")
+    public ResponseEntity<List<TaskResponseDTO>> filterTasks(
+            @RequestParam Status status) {
+
+    long userId = 1l;
+
+    List<TaskResponseDTO> filtredList = taskService.getTasksByStatus(status, userId);
+
+    return ResponseEntity.ok(filtredList);
+}
 }

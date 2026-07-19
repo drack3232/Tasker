@@ -1,11 +1,14 @@
 package com.trasker.Tasker.DTO;
 
+import com.trasker.Tasker.Entity.Status;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDateTime;
 
 public record TaskCreateDTO(
         String description,
+
+        Status status,
 
         @NotBlank(message = "Here you can have title for task")
         @Size(min = 3, max = 25)
