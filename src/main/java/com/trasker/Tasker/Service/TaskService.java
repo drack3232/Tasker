@@ -5,6 +5,7 @@ import com.trasker.Tasker.DTO.TaskResponseDTO;
 import com.trasker.Tasker.Entity.Status;
 import com.trasker.Tasker.Entity.Task;
 import com.trasker.Tasker.Reposetorys.TaskRepository;
+import com.trasker.Tasker.handle_exeption.TaskNotFoundExeption;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -62,7 +63,7 @@ public class TaskService {
     @Transactional
     public TaskResponseDTO updateTask(Long taskId,Long userId, TaskCreateDTO taskCreateDTO) {
         Task existingTask = taskRepository.findByIdAndUserId(taskId,userId )
-                .orElseThrow(() -> new IllegalArgumentException("Task with UsertId: " + taskId + "dont found!"));
+                .orElseThrow(() -> new TaskNotFoundExeption("Task not found"));
 
         existingTask.setTitle(taskCreateDTO.title());
         existingTask.setDescription(taskCreateDTO.description());
@@ -88,7 +89,7 @@ public class TaskService {
     @Transactional(readOnly = true)
     public String generateIcs(Long taskId, Long userId) {
         Task task = taskRepository.findByIdAndUserId(taskId, userId)
-                .orElseThrow(() -> new IllegalArgumentException("Task with UsertId: " + taskId + " dont found!"));
+                .orElseThrow(() -> new TaskNotFoundExeption("TaskId not found"));
 
         LocalDateTime timeFormat = task.getDeadline();
         if(timeFormat ==null){
