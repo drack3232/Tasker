@@ -26,5 +26,13 @@ private int jwtExpirationMs = 86400000;
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(pubKeyStr.getBytes());
     }
+    public String extractToken(String token){
+       return Jwts.parserBuilder()
+               .setSigningKey(getSigningKey())
+               .build()
+               .parseClaimsJws(token)
+               .getBody()
+               .getSubject();
+    }
 }
 
