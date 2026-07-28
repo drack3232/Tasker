@@ -34,5 +34,10 @@ private int jwtExpirationMs = 86400000;
                .getBody()
                .getSubject();
     }
+
+    public boolean isTokenValid ( String token, UserDetails user){
+       final String username = extractToken(token);
+       return  (username.equals(user.getUsername()));
+    }
 }
 
